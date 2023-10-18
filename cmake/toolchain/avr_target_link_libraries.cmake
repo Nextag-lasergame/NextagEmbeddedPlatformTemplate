@@ -1,0 +1,23 @@
+function(avr_target_link_libraries EXECUTABLE_TARGET)
+    if(NOT ARGN)
+        message(FATAL_ERROR "Nothing to link to ${EXECUTABLE_TARGET}.")
+    endif(NOT ARGN)
+
+    get_target_property(TARGET_LIST ${EXECUTABLE_TARGET} OUTPUT_NAME)
+
+    foreach(TGT ${ARGN})
+        list(APPEND NON_TARGET_LIST ${TGT})
+        if(TARGET ${TGT})
+            get_target_property(ARG_NAME ${TGT} OUTPUT_NAME)
+            if(${ARG_NAME} STREQUAL "ARG_NAME-NOTFOUND")
+                list(APPEND NON_TARGET_LIST ${TGT})
+            else(${ARG_NAME} STREQUAL "ARG_NAME-NOTFOUND")
+                list(APPEND NON_TARGET_LIST ${ARG_NAME})
+            endif(${ARG_NAME} STREQUAL "ARG_NAME-NOTFOUND")
+        else(TARGET ${TGT})
+            list(APPEND NON_TARGET_LIST ${TGT})
+        endif(TARGET ${TGT})
+    endforeach(TGT ${ARGN})
+
+    target_link_libraries(${TARGET_LIST} ${NON_TARGET_LIST})
+endfunction(avr_target_link_libraries EXECUTABLE_TARGET)
